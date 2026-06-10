@@ -1,0 +1,121 @@
+======================================================================
+  PHASE 4 EVALUATION REPORT — TV02
+======================================================================
+
+1. OVERVIEW
+----------------------------------------
+  Video duration:         93s
+  Timeline coverage:      0-93s (100%)
+  GT events (total):      24
+  GT suspicious events:   20
+  GT hard negatives:      4
+  Timeline observations:  632
+  Tracked people:         7
+
+  GT suspicious class distribution:
+    looking_sideways            7  → head_turn
+    leaning_to_neighbor         6  → lateral_movement
+    passing_note                4  → lateral_movement
+    talking_to_neighbor         3  → head_turn
+
+
+2. EVENT-LEVEL DETECTION (within coverage, 20 events)
+----------------------------------------
+  Detected (any suspicious):   20 / 20 (100.0%)
+  Flagged (3-of-5 rule):       19 / 20 (95.0%)
+  Class correct:               19 / 20 (95.0%)
+
+  Detection latency (from event start):
+    Mean:   0.2s
+    Median: 0.0s
+    Max:    3.0s
+
+  Pose-detectable events only (excl. using_phone):
+    Detected:  20 / 20 (100.0%)
+    Flagged:   19 / 20
+    Class OK:  19 / 20
+
+
+3. PER-EVENT DETAIL
+----------------------------------------
+  Time         Seat  GT Class                   Det  Flag  Class   Lat
+  ─────────────────────────────────────────────────────────────────
+  00:07-00:10 A2    leaning_to_neighbor          ✓            ✓    3s
+  00:09-00:12 B2    looking_sideways             ✓     ✓      ✓    1s
+  00:12-00:16 B3    talking_to_neighbor          ✓     ✓      ✓    0s
+  00:17-00:20 B1    looking_sideways             ✓     ✓      ✓    0s
+  00:20-00:23 A1    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:23-00:28 B2    passing_note                 ✓     ✓      ✓    0s
+  00:25-00:28 A3    looking_sideways             ✓     ✓      ✓    0s
+  00:39-00:43 B2    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:39-00:43 B4    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:44-00:46 B3    looking_sideways             ✓     ✓      ✓    0s
+  00:46-00:49 B3    looking_sideways             ✓     ✓      ✓    0s
+  00:49-00:52 A1    looking_sideways             ✓     ✓      ✓    0s
+  00:54-00:57 B3    passing_note                 ✓     ✓      ✓    0s
+  00:57-01:01 A2    leaning_to_neighbor          ✓     ✓      ✓    0s
+  01:02-01:05 B2    leaning_to_neighbor          ✓     ✓      ✓    0s
+  01:07-01:10 B1    talking_to_neighbor          ✓     ✓      ✓    0s
+  01:11-01:14 A1    talking_to_neighbor          ✓     ✓      ✓    0s
+  01:13-01:15 B3    looking_sideways             ✓     ✓      ✗    0s
+  01:18-01:22 B3    passing_note                 ✓     ✓      ✓    0s
+  01:18-01:25 A3    passing_note                 ✓     ✓      ✓    0s
+
+
+4. TIME-BASED ANALYSIS (0-93s)
+----------------------------------------
+  Period                Seconds  Model sus%  Model flag%
+  ───────────────────────────────────────────────────────
+  suspicious                 65       89.2%        60.0%
+  hard_negative               9       44.4%        22.2%
+  quiet                      20       20.0%        15.0%
+
+  Interpretation:
+    "suspicious" = GT suspicious event active → model SHOULD flag
+    "hard_negative" = GT normal event (fidgeting etc.) → model should NOT flag
+    "quiet" = nothing annotated → model should NOT flag
+
+
+5. PER-PERSON BREAKDOWN
+----------------------------------------
+  Person     Obs   Sus   Sus%  Flag   Flag% Time Range     
+  ───────────────────────────────────────────────────────
+  P2          91    13   14%     5     5%  0:03-1:33      
+           lateral_movement: 10
+           head_turn: 3
+  P3          91     8    9%     0     0%  0:03-1:33      
+           head_turn: 8
+  P4          91    17   19%     7     8%  0:03-1:33      
+           head_turn: 12
+           lateral_movement: 5
+  P5          91    30   33%    26    29%  0:03-1:33      
+           lateral_movement: 18
+           head_turn: 12
+  P6          88    22   25%    18    20%  0:03-1:33      
+           lateral_movement: 12
+           head_turn: 10
+  P7          89    11   12%     5     6%  0:03-1:33      
+           lateral_movement: 9
+           head_turn: 2
+  P8          91    13   14%     6     7%  0:03-1:33      
+           lateral_movement: 9
+           head_turn: 4
+
+
+6. TRACKER STABILITY
+----------------------------------------
+  Unique track IDs:    7
+  Expected people:     8
+  ID reassignments:    0
+  Stable tracks (>80% coverage): 7
+  Transient tracks:              0
+
+
+7. SUMMARY
+======================================================================
+  Event detection rate:     20/20 (100%)
+  Event flagging rate:      19/20 (95%)
+  Class accuracy:           19/20 (95%)
+  False alarm (quiet):      15% of quiet seconds
+  False alarm (hard neg):   22% of hard negative seconds
+  Tracker stability:        7/8 stable tracks

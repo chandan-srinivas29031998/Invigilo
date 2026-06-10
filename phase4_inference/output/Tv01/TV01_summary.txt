@@ -1,0 +1,13 @@
+Invigilo Inference Summary
+==============================
+
+Video: TV01.mp4
+Duration: 74.9 seconds
+Frames: 2247
+Speed: 6.5 fps
+Time: 344.4 seconds
+Threshold: 0.20
+Flagging rule: 4-of-7
+Baseline calibration: OFF
+Tracker: ByteTrack
+Track merges: 1

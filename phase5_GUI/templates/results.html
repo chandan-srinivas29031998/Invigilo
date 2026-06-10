@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}Results — {{ data.video_name }} — Invigilo{% endblock %}
+
+{% block content %}
+<section class="results-header">
+    <div class="results-title">
+        <h1>{{ data.video_name }}</h1>
+        <div class="results-meta">
+            <span class="results-badge">Duration: {{ data.video_duration }}s</span>
+            <span class="results-badge">Processed in {{ data.processing_time }}s</span>
+        </div>
+    </div>
+    <div class="results-actions">
+        <a href="{{ url_for('index') }}" class="btn btn-outline">← New Session</a>
+    </div>
+</section>
+
+{% if data.stats %}
+<section class="stats-row">
+    <div class="stat-card">
+        <div class="stat-value">{{ data.stats.total_observations }}</div>
+        <div class="stat-label">Total Observations</div>
+    </div>
+    <div class="stat-card warn">
+        <div class="stat-value">{{ data.stats.suspicious_observations }}</div>
+        <div class="stat-label">Suspicious ({{ data.stats.suspicious_rate }}%)</div>
+    </div>
+    <div class="stat-card danger">
+        <div class="stat-value">{{ data.stats.flagged_observations }}</div>
+        <div class="stat-label">Flagged ({{ data.stats.flagged_rate }}%)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ data.persons|length if data.persons else 0 }}</div>
+        <div class="stat-label">People Tracked</div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Video player -->
+<section class="video-section">
+    <div class="card">
+        <h2>Annotated Video</h2>
+        <div class="video-wrap">
+            <video controls width="100%" preload="metadata">
+                <source src="{{ url_for('serve_output', job_id=job.id, filename=job.outputs.annotated_video_name) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="video-actions">
+            <a href="{{ url_for('serve_output', job_id=job.id, filename=job.outputs.annotated_video_name) }}" class="btn btn-sm" download="{{ job.outputs.annotated_video_name }}">
+                ↓ Download Annotated Video
+            </a>
+            <a href="{{ url_for('serve_output', job_id=job.id, filename=job.outputs.timeline_csv_name) }}" class="btn btn-sm btn-outline" download="{{ job.outputs.timeline_csv_name }}">
+                ↓ Timeline CSV
+            </a>
+            <a href="{{ url_for('serve_output', job_id=job.id, filename=job.outputs.summary_txt_name) }}" class="btn btn-sm btn-outline" download="{{ job.outputs.summary_txt_name }}">
+                ↓ Summary Report
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Per-person breakdown -->
+{% if data.persons %}
+<section class="persons-section">
+    <div class="card">
+        <h2>Per-Person Breakdown</h2>
+        <div class="persons-table-wrap">
+            <table class="persons-table">
+                <thead>
+                    <tr>
+                        <th>Person</th>
+                        <th>Observations</th>
+                        <th>Suspicious</th>
+                        <th>Flagged</th>
+                        <th>Sus. Rate</th>
+                        <th>Classes Detected</th>
+                        <th>Activity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in data.persons %}
+                    <tr class="{{ 'flagged-row' if p.flagged > 0 else '' }}">
+                        <td><span class="person-badge">{{ p.label }}</span></td>
+                        <td>{{ p.total }}</td>
+                        <td>{{ p.suspicious }}</td>
+                        <td>
+                            {% if p.flagged > 0 %}
+                            <span class="flag-count">{{ p.flagged }}</span>
+                            {% else %}0{% endif %}
+                        </td>
+                        <td>
+                            {% set rate = (p.suspicious / p.total * 100) if p.total > 0 else 0 %}
+                            <div class="rate-bar-wrap">
+                                <div class="rate-bar" style="width: {{ rate }}%"></div>
+                                <span>{{ rate|round(1) }}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% for cls, cnt in p.classes.items() %}
+                            <span class="class-tag tag-{{ cls }}">{{ cls.replace('_', ' ') }} ({{ cnt }})</span>
+                            {% endfor %}
+                            {% if not p.classes %}
+                            <span class="class-tag tag-normal">normal only</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="mini-bar" title="{{ p.suspicious }} sus / {{ p.total }} total">
+                                <div class="mini-bar-fill" style="width: {{ rate }}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if data.summary %}
+<section class="summary-section">
+    <div class="card">
+        <h2>Processing Summary</h2>
+        <pre class="summary-pre">{{ data.summary }}</pre>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

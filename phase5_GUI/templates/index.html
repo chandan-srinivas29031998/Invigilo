@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Invigilo — AI-Assisted Exam Proctoring{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-text">
+        <h1>Invigilo</h1>
+        <p class="hero-sub">AI-assisted suspicious behaviour detection for examination halls. Pose-based deep learning identifies head turns, lateral movement, and other suspicious activities in real time.</p>
+    </div>
+
+    {% if not status.inference_available or not status.pkg_exists %}
+    <div class="status-strip">
+        <div class="status-pill {{ 'ok' if status.inference_available else 'err' }}">
+            <span class="dot"></span>
+            Engine {{ 'Ready' if status.inference_available else 'Unavailable' }}
+        </div>
+        <div class="status-pill {{ 'ok' if status.pkg_exists else 'err' }}">
+            <span class="dot"></span>
+            Model {{ 'Loaded' if status.pkg_exists else 'Missing' }}
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+{% if not status.inference_available or not status.pkg_exists %}
+<section class="card card-warn">
+    <h3>Setup Required</h3>
+    <p>Place these files in the same directory as <code>app.py</code>:</p>
+    <ul>
+        <li><code>phase4_inference_v3.py</code> — inference pipeline</li>
+        <li><code>inference_package_v11.pth</code> — trained model weights</li>
+    </ul>
+    <p>Then restart: <code>python app.py</code></p>
+</section>
+{% endif %}
+
+<section class="mode-select">
+    <a href="{{ url_for('upload_page') }}" class="mode-card {{ '' if status.inference_available else 'disabled' }}">
+        <div class="mode-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+        </div>
+        <h2>Upload Video</h2>
+        <p>Upload recorded exam footage for analysis. Supports MP4, AVI, MOV, MKV, and WebM files up to 500 MB.</p>
+        <span class="mode-cta">Select file →</span>
+    </a>
+
+    <a href="{{ url_for('start_webcam') }}" class="mode-card {{ '' if status.inference_available else 'disabled' }}">
+        <div class="mode-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 7l-7 5 7 5V7z"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+        </div>
+        <h2>Live Webcam</h2>
+        <p>Monitor a live camera feed in real time. Uses your connected webcam for live detection and alerting.</p>
+        <span class="mode-cta">Start camera →</span>
+    </a>
+</section>
+
+<section class="pipeline-section">
+    <h2>Detection Pipeline</h2>
+    <div class="pipeline-grid">
+        <div class="pipe-step">
+            <div class="pipe-num">1</div>
+            <h4>Detect People</h4>
+            <p>YOLOv8 locates each person in every frame.</p>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+            <div class="pipe-num">2</div>
+            <h4>Track &amp; Pose</h4>
+            <p>ByteTrack assigns stable IDs. MediaPipe extracts 33 keypoints.</p>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+            <div class="pipe-num">3</div>
+            <h4>Feature Engineering</h4>
+            <p>13 pose features aggregated into 78-dim vectors over 3-second windows.</p>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+            <div class="pipe-num">4</div>
+            <h4>Classify &amp; Flag</h4>
+            <p>Two-stage MLP classifier with 4-of-7 sustained behaviour flagging.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

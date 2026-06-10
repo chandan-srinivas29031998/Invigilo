@@ -1,0 +1,13 @@
+Invigilo Inference Summary
+==============================
+
+Video: TV09.MOV
+Duration: 93.0 seconds
+Frames: 2789
+Speed: 8.1 fps
+Time: 343.3 seconds
+Threshold: 0.20
+Flagging rule: 4-of-7
+Baseline calibration: OFF
+Tracker: ByteTrack
+Track merges: 0

@@ -1,0 +1,107 @@
+======================================================================
+  PHASE 4 EVALUATION REPORT — TV09
+======================================================================
+
+1. OVERVIEW
+----------------------------------------
+  Video duration:         92s
+  Timeline coverage:      0-92s (100%)
+  GT events (total):      9
+  GT suspicious events:   8
+  GT hard negatives:      1
+  Timeline observations:  444
+  Tracked people:         6
+
+  GT suspicious class distribution:
+    leaning_to_neighbor         2  → lateral_movement
+    looking_sideways            2  → head_turn
+    talking_to_neighbor         2  → head_turn
+    passing_note                2  → lateral_movement
+
+
+2. EVENT-LEVEL DETECTION (within coverage, 8 events)
+----------------------------------------
+  Detected (any suspicious):    8 / 8 (100.0%)
+  Flagged (3-of-5 rule):        8 / 8 (100.0%)
+  Class correct:                7 / 8 (87.5%)
+
+  Detection latency (from event start):
+    Mean:   1.1s
+    Median: 0.0s
+    Max:    3.0s
+
+  Pose-detectable events only (excl. using_phone):
+    Detected:   8 / 8 (100.0%)
+    Flagged:    8 / 8
+    Class OK:   7 / 8
+
+
+3. PER-EVENT DETAIL
+----------------------------------------
+  Time         Seat  GT Class                   Det  Flag  Class   Lat
+  ─────────────────────────────────────────────────────────────────
+  00:16-00:20 A2    leaning_to_neighbor          ✓     ✓      ✓    3s
+  00:25-00:29 B1    looking_sideways             ✓     ✓      ✓    0s
+  00:34-00:40 A1    talking_to_neighbor          ✓     ✓      ✓    0s
+  00:40-00:44 B2    passing_note                 ✓     ✓      ✓    0s
+  00:52-00:58 A3    passing_note                 ✓     ✓      ✗    3s
+  01:00-01:05 A2    looking_sideways             ✓     ✓      ✓    0s
+  01:07-01:15 B2    leaning_to_neighbor          ✓     ✓      ✓    0s
+  01:22-01:27 A2    talking_to_neighbor          ✓     ✓      ✓    3s
+
+
+4. TIME-BASED ANALYSIS (0-92s)
+----------------------------------------
+  Period                Seconds  Model sus%  Model flag%
+  ───────────────────────────────────────────────────────
+  suspicious                 49       51.0%        22.4%
+  hard_negative               0        0.0%         0.0%
+  quiet                      44       40.9%        47.7%
+
+  Interpretation:
+    "suspicious" = GT suspicious event active → model SHOULD flag
+    "hard_negative" = GT normal event (fidgeting etc.) → model should NOT flag
+    "quiet" = nothing annotated → model should NOT flag
+
+
+5. PER-PERSON BREAKDOWN
+----------------------------------------
+  Person     Obs   Sus   Sus%  Flag   Flag% Time Range     
+  ───────────────────────────────────────────────────────
+  P2          88    18   20%    12    14%  0:03-1:32      
+           head_turn: 9
+           lateral_movement: 9
+  P3          18     0    0%     0     0%  0:03-0:20      
+  P4          90     8    9%     9    10%  0:03-1:32      
+           lateral_movement: 7
+           head_turn: 1
+  P5          90    21   23%    15    17%  0:03-1:32      
+           lateral_movement: 12
+           head_turn: 9
+  P6          89    10   11%     9    10%  0:03-1:32      
+           lateral_movement: 7
+           head_turn: 3
+  P7          69     4    6%     0     0%  0:24-1:32      
+           head_turn: 3
+           lateral_movement: 1
+
+
+6. TRACKER STABILITY
+----------------------------------------
+  Unique track IDs:    6
+  Expected people:     8
+  ID reassignments:    0
+  Stable tracks (>80% coverage): 4
+  Transient tracks:              2
+    P3 (ID=2): 0:03-0:20, 18 obs
+    P7 (ID=6): 0:24-1:32, 69 obs
+
+
+7. SUMMARY
+======================================================================
+  Event detection rate:     8/8 (100%)
+  Event flagging rate:      8/8 (100%)
+  Class accuracy:           7/8 (88%)
+  False alarm (quiet):      48% of quiet seconds
+  False alarm (hard neg):   0% of hard negative seconds
+  Tracker stability:        4/8 stable tracks

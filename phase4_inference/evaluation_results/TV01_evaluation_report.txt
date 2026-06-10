@@ -1,0 +1,116 @@
+======================================================================
+  PHASE 4 EVALUATION REPORT — TV01
+======================================================================
+
+1. OVERVIEW
+----------------------------------------
+  Video duration:         84s
+  Timeline coverage:      0-74s (88%)
+  GT events (total):      17
+  GT suspicious events:   12
+  GT hard negatives:      5
+  Timeline observations:  501
+  Tracked people:         8
+
+  GT suspicious class distribution:
+    leaning_to_neighbor         5  → lateral_movement
+    looking_sideways            3  → head_turn
+    talking_to_neighbor         2  → head_turn
+    passing_note                2  → lateral_movement
+
+
+2. EVENT-LEVEL DETECTION (within coverage, 12 events)
+----------------------------------------
+  Detected (any suspicious):   12 / 12 (100.0%)
+  Flagged (3-of-5 rule):        9 / 12 (75.0%)
+  Class correct:                9 / 12 (75.0%)
+
+  Detection latency (from event start):
+    Mean:   0.5s
+    Median: 0.0s
+    Max:    4.0s
+
+  Pose-detectable events only (excl. using_phone):
+    Detected:  12 / 12 (100.0%)
+    Flagged:    9 / 12
+    Class OK:   9 / 12
+
+
+3. PER-EVENT DETAIL
+----------------------------------------
+  Time         Seat  GT Class                   Det  Flag  Class   Lat
+  ─────────────────────────────────────────────────────────────────
+  00:07-00:15 A1    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:10-00:14 A3    talking_to_neighbor          ✓     ✓      ✓    0s
+  00:14-00:17 B3    passing_note                 ✓     ✓      ✓    0s
+  00:17-00:21 B1    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:21-00:24 A2    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:24-00:29 B3    looking_sideways             ✓     ✓      ✓    0s
+  00:26-00:29 B2    looking_sideways             ✓     ✓      ✓    0s
+  00:42-00:45 B1    passing_note                 ✓     ✓      ✗    0s
+  00:47-00:52 A4    leaning_to_neighbor          ✓     ✓      ✓    4s
+  00:51-00:58 A1    looking_sideways             ✓            ✗    0s
+  01:00-01:05 A3    leaning_to_neighbor          ✓            ✗    2s
+  01:05-01:10 B1    talking_to_neighbor          ✓            ✓    0s
+
+
+4. TIME-BASED ANALYSIS (0-74s)
+----------------------------------------
+  Period                Seconds  Model sus%  Model flag%
+  ───────────────────────────────────────────────────────
+  suspicious                 50       60.0%        48.0%
+  hard_negative              11       63.6%        81.8%
+  quiet                      14       35.7%        21.4%
+
+  Interpretation:
+    "suspicious" = GT suspicious event active → model SHOULD flag
+    "hard_negative" = GT normal event (fidgeting etc.) → model should NOT flag
+    "quiet" = nothing annotated → model should NOT flag
+
+
+5. PER-PERSON BREAKDOWN
+----------------------------------------
+  Person     Obs   Sus   Sus%  Flag   Flag% Time Range     
+  ───────────────────────────────────────────────────────
+  P2          72    13   18%    11    15%  0:03-1:14      
+           head_turn: 8
+           lateral_movement: 5
+  P3          72    13   18%     5     7%  0:03-1:14      
+           head_turn: 8
+           lateral_movement: 5
+  P4          72     5    7%     0     0%  0:03-1:14      
+           lateral_movement: 5
+  P5          72    17   24%     9    12%  0:03-1:14      
+           lateral_movement: 10
+           head_turn: 7
+  P6          72     8   11%     4     6%  0:03-1:14      
+           head_turn: 5
+           lateral_movement: 3
+  P7          10     0    0%     0     0%  0:03-0:12      
+  P8          72    33   46%    35    49%  0:03-1:14      
+           lateral_movement: 18
+           head_turn: 15
+  P9          59    14   24%     6    10%  0:16-1:14      
+           head_turn: 13
+           lateral_movement: 1
+
+
+6. TRACKER STABILITY
+----------------------------------------
+  Unique track IDs:    8
+  Expected people:     8
+  ID reassignments:    0
+  Stable tracks (>80% coverage): 6
+  Transient tracks:              2
+    P7 (ID=6): 0:03-0:12, 10 obs
+    P9 (ID=8): 0:16-1:14, 59 obs
+
+
+7. SUMMARY
+======================================================================
+  Event detection rate:     12/12 (100%)
+  Event flagging rate:      9/12 (75%)
+  Class accuracy:           9/12 (75%)
+  False alarm (quiet):      21% of quiet seconds
+  False alarm (hard neg):   82% of hard negative seconds
+  Tracker stability:        6/8 stable tracks

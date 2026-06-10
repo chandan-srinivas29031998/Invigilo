@@ -1,0 +1,107 @@
+======================================================================
+  PHASE 4 EVALUATION REPORT — TV08
+======================================================================
+
+1. OVERVIEW
+----------------------------------------
+  Video duration:         92s
+  Timeline coverage:      0-92s (100%)
+  GT events (total):      13
+  GT suspicious events:   9
+  GT hard negatives:      4
+  Timeline observations:  448
+  Tracked people:         5
+
+  GT suspicious class distribution:
+    leaning_to_neighbor         4  → lateral_movement
+    looking_sideways            3  → head_turn
+    talking_to_neighbor         1  → head_turn
+    passing_note                1  → lateral_movement
+
+
+2. EVENT-LEVEL DETECTION (within coverage, 9 events)
+----------------------------------------
+  Detected (any suspicious):    8 / 9 (88.9%)
+  Flagged (3-of-5 rule):        3 / 9 (33.3%)
+  Class correct:                7 / 9 (77.8%)
+
+  Detection latency (from event start):
+    Mean:   2.6s
+    Median: 2.5s
+    Max:    6.0s
+
+  Pose-detectable events only (excl. using_phone):
+    Detected:   8 / 9 (88.9%)
+    Flagged:    3 / 9
+    Class OK:   7 / 9
+
+
+3. PER-EVENT DETAIL
+----------------------------------------
+  Time         Seat  GT Class                   Det  Flag  Class   Lat
+  ─────────────────────────────────────────────────────────────────
+  00:17-00:21 A3    leaning_to_neighbor          ✓     ✓      ✓    3s
+  00:25-00:28 A1    leaning_to_neighbor          ✓            ✓    4s
+  00:27-00:34 B2    talking_to_neighbor          ✓     ✓      ✓    2s
+  00:32-00:35 A2    looking_sideways             ✓     ✓      ✓    0s
+  00:45-00:50 A2    leaning_to_neighbor          ✓            ✓    3s
+  00:54-01:00 A1    passing_note                 ✓            ✓    2s
+  01:05-01:11 B2    leaning_to_neighbor          ✓            ✗    6s
+  01:10-01:14 A1    looking_sideways             ✓            ✓    1s
+  01:23-01:26 A2    looking_sideways             ✗            ✗     —
+
+  MISSED EVENTS (1):
+    01:23-01:26 A2 looking_sideways
+
+
+4. TIME-BASED ANALYSIS (0-92s)
+----------------------------------------
+  Period                Seconds  Model sus%  Model flag%
+  ───────────────────────────────────────────────────────
+  suspicious                 43       44.2%         7.0%
+  hard_negative              15       46.7%        33.3%
+  quiet                      35        2.9%         8.6%
+
+  Interpretation:
+    "suspicious" = GT suspicious event active → model SHOULD flag
+    "hard_negative" = GT normal event (fidgeting etc.) → model should NOT flag
+    "quiet" = nothing annotated → model should NOT flag
+
+
+5. PER-PERSON BREAKDOWN
+----------------------------------------
+  Person     Obs   Sus   Sus%  Flag   Flag% Time Range     
+  ───────────────────────────────────────────────────────
+  P2          90     5    6%     0     0%  0:03-1:32      
+           lateral_movement: 3
+           head_turn: 2
+  P3          90    17   19%    11    12%  0:03-1:32      
+           head_turn: 14
+           lateral_movement: 3
+  P4          89     8    9%     0     0%  0:03-1:32      
+           lateral_movement: 7
+           head_turn: 1
+  P5          89     6    7%     4     4%  0:03-1:32      
+           lateral_movement: 6
+  P6          90     4    4%     0     0%  0:03-1:32      
+           lateral_movement: 2
+           head_turn: 2
+
+
+6. TRACKER STABILITY
+----------------------------------------
+  Unique track IDs:    5
+  Expected people:     8
+  ID reassignments:    0
+  Stable tracks (>80% coverage): 5
+  Transient tracks:              0
+
+
+7. SUMMARY
+======================================================================
+  Event detection rate:     8/9 (89%)
+  Event flagging rate:      3/9 (33%)
+  Class accuracy:           7/9 (78%)
+  False alarm (quiet):      9% of quiet seconds
+  False alarm (hard neg):   33% of hard negative seconds
+  Tracker stability:        5/8 stable tracks

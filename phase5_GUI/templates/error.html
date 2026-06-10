@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Error — Invigilo{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <div class="card">
+        <h2>Something Went Wrong</h2>
+        <p class="error-msg">{{ message }}</p>
+        <a href="{{ url_for('index') }}" class="btn">← Back to Home</a>
+    </div>
+</section>
+{% endblock %}

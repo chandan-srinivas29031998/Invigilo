@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block title %}Monitor — Invigilo{% endblock %}
+
+{% block head %}
+<style>
+.monitor-layout { display: grid; grid-template-columns: 1fr 360px; gap: 1rem; margin-bottom: 1rem; }
+.monitor-feed { position: relative; }
+.monitor-feed img { width: 100%; display: block; border-radius: var(--radius); background: #000; min-height: 300px; object-fit: contain; }
+.monitor-sidebar { display: flex; flex-direction: column; gap: 1rem; max-height: 560px; }
+.flag-panel { flex: 0 0 auto; max-height: 240px; overflow-y: auto; }
+.flag-panel h3 { font-family: var(--font-mono); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--c-text-dim); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--c-border); }
+.flag-count-badge { font-family: var(--font-mono); font-size: 0.7rem; background: var(--c-red); color: #fff; padding: 0.1em 0.5em; border-radius: 10px; margin-left: 0.4rem; }
+.flag-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid var(--c-border); }
+.flag-item:last-child { border-bottom: none; }
+.flag-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c-red); margin-top: 3px; flex-shrink: 0; box-shadow: 0 0 8px var(--c-red); animation: pulse-dot 1.5s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100%{box-shadow:0 0 4px var(--c-red)} 50%{box-shadow:0 0 12px var(--c-red)} }
+.flag-info { flex: 1; }
+.flag-person { font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; color: var(--c-text-bright); }
+.flag-class { font-family: var(--font-mono); font-size: 0.75rem; margin-left: 0.4rem; }
+.flag-class.head_turn { color: var(--c-amber); }
+.flag-class.lateral_movement { color: var(--c-red); }
+.flag-meta { font-family: var(--font-mono); font-size: 0.68rem; color: var(--c-text-dim); margin-top: 2px; }
+.flag-empty { font-family: var(--font-mono); font-size: 0.78rem; color: var(--c-text-dim); padding: 1rem 0; text-align: center; }
+.log-panel { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+.log-panel h3 { font-family: var(--font-mono); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--c-text-dim); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--c-border); }
+.log-scroll { flex: 1; overflow-y: auto; min-height: 0; }
+.log-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+.log-table th { font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-text-dim); text-align: left; padding: 0.35rem 0.4rem; border-bottom: 1px solid var(--c-border); position: sticky; top: 0; background: var(--c-surface); }
+.log-table td { padding: 0.3rem 0.4rem; border-bottom: 1px solid rgba(42,47,62,0.5); font-family: var(--font-mono); }
+.log-table tr.flagged-row td { background: rgba(239,68,68,0.06); }
+.log-table .cls-head_turn { color: var(--c-amber); }
+.log-table .cls-lateral_movement { color: var(--c-red); }
+.log-table .log-flag { color: var(--c-red); font-weight: 700; }
+.control-bar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.control-buttons { display: flex; gap: 0.5rem; }
+.btn-start { background: var(--c-green); color: #000; }
+.btn-start:hover { opacity: 0.85; }
+.btn-stop { background: var(--c-red); color: #fff; }
+.btn-stop:hover { opacity: 0.85; }
+.btn-results { background: var(--c-accent); color: #000; }
+.live-stats { display: flex; gap: 1.2rem; flex: 1; justify-content: flex-end; flex-wrap: wrap; }
+.stat-chip { font-family: var(--font-mono); font-size: 0.75rem; color: var(--c-text-dim); }
+.stat-chip strong { color: var(--c-text-bright); font-weight: 600; }
+.live-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--c-red); text-transform: uppercase; letter-spacing: 0.06em; }
+.live-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-red); animation: pulse-dot 1.5s ease-in-out infinite; }
+.live-badge.off { color: var(--c-text-dim); }
+.live-badge.off .dot { background: var(--c-text-dim); animation: none; }
+.monitor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.monitor-header h1 { font-family: var(--font-mono); font-size: 1.15rem; }
+.feed-label { position: absolute; top: 10px; left: 10px; font-family: var(--font-mono); font-size: 0.7rem; color: var(--c-text-dim); background: rgba(0,0,0,0.7); padding: 0.2em 0.6em; border-radius: 4px; z-index: 2; }
+@media (max-width: 800px) { .monitor-layout { grid-template-columns: 1fr; } .monitor-sidebar { max-height: none; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="monitor-header">
+    <div>
+        <h1>{{ job.video_name }}</h1>
+        <span class="live-badge off" id="live-badge"><span class="dot"></span> Standby</span>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn btn-outline btn-sm">← Back</a>
+</section>
+
+<section class="monitor-layout">
+    <div class="monitor-feed">
+        <span class="feed-label" id="feed-label">{{ 'CAM' if job.mode == 'webcam' else job.video_name }}</span>
+        <img id="stream-img" src="{{ url_for('video_stream', job_id=job.id) }}" alt="Video feed">
+    </div>
+
+    <div class="monitor-sidebar">
+        <div class="card flag-panel" id="flag-panel">
+            <h3>Flagged Events <span class="flag-count-badge" id="flag-count">0</span></h3>
+            <div id="flag-list">
+                <div class="flag-empty">No active flags</div>
+            </div>
+        </div>
+
+        <div class="card log-panel">
+            <h3>Event Log</h3>
+            <div class="log-scroll" id="log-scroll">
+                <table class="log-table">
+                    <thead><tr><th>Time</th><th>Person</th><th>Class</th><th>Conf</th><th></th></tr></thead>
+                    <tbody id="log-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="card control-bar">
+    <div class="control-buttons">
+        <button class="btn btn-start" id="btn-start" onclick="startMonitoring()">Start Monitoring</button>
+        <button class="btn btn-stop" id="btn-stop" onclick="stopMonitoring()" style="display:none">Stop Monitoring</button>
+        <a class="btn btn-results" id="btn-results" href="{{ url_for('results', job_id=job.id) }}" style="display:none">View Results →</a>
+    </div>
+    <div class="live-stats" id="live-stats">
+        <span class="stat-chip"><strong id="s-time">00:00</strong> elapsed</span>
+        <span class="stat-chip"><strong id="s-people">0</strong> people</span>
+        <span class="stat-chip"><strong id="s-sus">0</strong> suspicious</span>
+        <span class="stat-chip"><strong id="s-flagged">0</strong> flagged</span>
+        <span class="stat-chip"><strong id="s-fps">0</strong> fps</span>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const JOB_ID = '{{ job.id }}';
+let polling = null;
+let lastEventIdx = 0;
+let isRunning = false;
+
+function startMonitoring() {
+    fetch(`/api/start/${JOB_ID}`, {method: 'POST'})
+        .then(r => r.json())
+        .then(() => {
+            isRunning = true;
+            document.getElementById('btn-start').style.display = 'none';
+            document.getElementById('btn-stop').style.display = '';
+            document.getElementById('live-badge').className = 'live-badge';
+            document.getElementById('live-badge').innerHTML = '<span class="dot"></span> LIVE';
+            startPolling();
+        });
+}
+
+function stopMonitoring() {
+    fetch(`/api/stop/${JOB_ID}`, {method: 'POST'})
+        .then(r => r.json())
+        .then(() => {
+            isRunning = false;
+            document.getElementById('btn-stop').style.display = 'none';
+            document.getElementById('live-badge').className = 'live-badge off';
+            document.getElementById('live-badge').innerHTML = '<span class="dot"></span> Stopping...';
+        });
+}
+
+function startPolling() {
+    if (polling) return;
+    polling = setInterval(pollState, 800);
+}
+
+function pollState() {
+    fetch(`/api/state/${JOB_ID}?last_event=${lastEventIdx}`)
+        .then(r => r.json())
+        .then(data => {
+            // Update stats
+            const s = data.stats || {};
+            document.getElementById('s-time').textContent = s.elapsed || '00:00';
+            document.getElementById('s-people').textContent = s.people || 0;
+            document.getElementById('s-sus').textContent = s.suspicious || 0;
+            document.getElementById('s-flagged').textContent = s.flagged || 0;
+            document.getElementById('s-fps').textContent = s.fps || 0;
+
+            // Update flags
+            const flags = data.flags || [];
+            const fc = document.getElementById('flag-count');
+            fc.textContent = flags.length;
+            const fl = document.getElementById('flag-list');
+            if (flags.length === 0) {
+                fl.innerHTML = '<div class="flag-empty">No active flags</div>';
+            } else {
+                fl.innerHTML = flags.map(f => `
+                    <div class="flag-item">
+                        <div class="flag-dot"></div>
+                        <div class="flag-info">
+                            <span class="flag-person">${f.person}</span>
+                            <span class="flag-class ${f.label}">${f.label.replace('_', ' ')}</span>
+                            <div class="flag-meta">Confidence: ${f.prob} | ${f.time}</div>
+                        </div>
+                    </div>`).join('');
+            }
+
+            // Append new log events
+            const tbody = document.getElementById('log-body');
+            const scroll = document.getElementById('log-scroll');
+            (data.new_events || []).forEach(e => {
+                const tr = document.createElement('tr');
+                if (e.flagged) tr.className = 'flagged-row';
+                tr.innerHTML = `<td>${e.time}</td><td>${e.person}</td><td class="cls-${e.label}">${e.label.replace('_',' ')}</td><td>${e.prob}</td><td>${e.flagged ? '<span class="log-flag">FLAG</span>' : ''}</td>`;
+                tbody.appendChild(tr);
+            });
+            lastEventIdx = data.total_events || lastEventIdx;
+            // Auto-scroll
+            if (data.new_events && data.new_events.length > 0) {
+                scroll.scrollTop = scroll.scrollHeight;
+            }
+
+            // Handle completion
+            if (data.status === 'complete') {
+                clearInterval(polling);
+                polling = null;
+                document.getElementById('btn-stop').style.display = 'none';
+                document.getElementById('btn-results').style.display = '';
+                document.getElementById('live-badge').className = 'live-badge off';
+                document.getElementById('live-badge').innerHTML = '<span class="dot"></span> Complete';
+            }
+            if (data.status === 'error') {
+                clearInterval(polling);
+                polling = null;
+                document.getElementById('btn-stop').style.display = 'none';
+                document.getElementById('live-badge').className = 'live-badge off';
+                document.getElementById('live-badge').innerHTML = '<span class="dot"></span> Error';
+                alert('Processing error: ' + (data.error || 'Unknown'));
+            }
+        })
+        .catch(() => {});
+}
+
+// Auto-start polling if already running (e.g. page refresh)
+{% if job.status == 'running' %}
+isRunning = true;
+document.getElementById('btn-start').style.display = 'none';
+document.getElementById('btn-stop').style.display = '';
+document.getElementById('live-badge').className = 'live-badge';
+document.getElementById('live-badge').innerHTML = '<span class="dot"></span> LIVE';
+startPolling();
+{% elif job.status == 'complete' %}
+document.getElementById('btn-start').style.display = 'none';
+document.getElementById('btn-results').style.display = '';
+document.getElementById('live-badge').className = 'live-badge off';
+document.getElementById('live-badge').innerHTML = '<span class="dot"></span> Complete';
+{% endif %}
+</script>
+{% endblock %}

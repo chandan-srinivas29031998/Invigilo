@@ -1,0 +1,108 @@
+======================================================================
+  PHASE 4 EVALUATION REPORT — TV06
+======================================================================
+
+1. OVERVIEW
+----------------------------------------
+  Video duration:         96s
+  Timeline coverage:      0-96s (100%)
+  GT events (total):      14
+  GT suspicious events:   10
+  GT hard negatives:      4
+  Timeline observations:  560
+  Tracked people:         6
+
+  GT suspicious class distribution:
+    leaning_to_neighbor         3  → lateral_movement
+    looking_sideways            3  → head_turn
+    passing_note                2  → lateral_movement
+    talking_to_neighbor         2  → head_turn
+
+
+2. EVENT-LEVEL DETECTION (within coverage, 10 events)
+----------------------------------------
+  Detected (any suspicious):   10 / 10 (100.0%)
+  Flagged (3-of-5 rule):       10 / 10 (100.0%)
+  Class correct:               10 / 10 (100.0%)
+
+  Detection latency (from event start):
+    Mean:   0.0s
+    Median: 0.0s
+    Max:    0.0s
+
+  Pose-detectable events only (excl. using_phone):
+    Detected:  10 / 10 (100.0%)
+    Flagged:   10 / 10
+    Class OK:  10 / 10
+
+
+3. PER-EVENT DETAIL
+----------------------------------------
+  Time         Seat  GT Class                   Det  Flag  Class   Lat
+  ─────────────────────────────────────────────────────────────────
+  00:08-00:14 A2    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:12-00:16 B2    looking_sideways             ✓     ✓      ✓    0s
+  00:19-00:26 A1    passing_note                 ✓     ✓      ✓    0s
+  00:30-00:34 B3    passing_note                 ✓     ✓      ✓    0s
+  00:34-00:40 A1    talking_to_neighbor          ✓     ✓      ✓    0s
+  00:40-00:50 B2    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:54-00:59 A2    talking_to_neighbor          ✓     ✓      ✓    0s
+  00:58-01:01 A1    looking_sideways             ✓     ✓      ✓    0s
+  01:15-01:21 B2    looking_sideways             ✓     ✓      ✓    0s
+  01:22-01:27 B3    leaning_to_neighbor          ✓     ✓      ✓    0s
+
+
+4. TIME-BASED ANALYSIS (0-96s)
+----------------------------------------
+  Period                Seconds  Model sus%  Model flag%
+  ───────────────────────────────────────────────────────
+  suspicious                 59       91.5%        88.1%
+  hard_negative              21      100.0%       100.0%
+  quiet                      17       76.5%        52.9%
+
+  Interpretation:
+    "suspicious" = GT suspicious event active → model SHOULD flag
+    "hard_negative" = GT normal event (fidgeting etc.) → model should NOT flag
+    "quiet" = nothing annotated → model should NOT flag
+
+
+5. PER-PERSON BREAKDOWN
+----------------------------------------
+  Person     Obs   Sus   Sus%  Flag   Flag% Time Range     
+  ───────────────────────────────────────────────────────
+  P2          94    38   40%    36    38%  0:03-1:36      
+           lateral_movement: 27
+           head_turn: 11
+  P3          92    33   36%    27    29%  0:03-1:36      
+           lateral_movement: 32
+           head_turn: 1
+  P4          93    30   32%    26    28%  0:03-1:36      
+           lateral_movement: 25
+           head_turn: 5
+  P5          94     9   10%     0     0%  0:03-1:36      
+           lateral_movement: 9
+  P6          93    70   75%    75    81%  0:03-1:36      
+           lateral_movement: 62
+           head_turn: 8
+  P7          94    39   41%    34    36%  0:03-1:36      
+           lateral_movement: 38
+           head_turn: 1
+
+
+6. TRACKER STABILITY
+----------------------------------------
+  Unique track IDs:    6
+  Expected people:     8
+  ID reassignments:    0
+  Stable tracks (>80% coverage): 6
+  Transient tracks:              0
+
+
+7. SUMMARY
+======================================================================
+  Event detection rate:     10/10 (100%)
+  Event flagging rate:      10/10 (100%)
+  Class accuracy:           10/10 (100%)
+  False alarm (quiet):      53% of quiet seconds
+  False alarm (hard neg):   100% of hard negative seconds
+  Tracker stability:        6/8 stable tracks

@@ -1,0 +1,112 @@
+======================================================================
+  PHASE 4 EVALUATION REPORT — TV05
+======================================================================
+
+1. OVERVIEW
+----------------------------------------
+  Video duration:         89s
+  Timeline coverage:      0-79s (89%)
+  GT events (total):      15
+  GT suspicious events:   10
+  GT hard negatives:      5
+  Timeline observations:  456
+  Tracked people:         7
+
+  GT suspicious class distribution:
+    leaning_to_neighbor         4  → lateral_movement
+    looking_sideways            3  → head_turn
+    passing_note                2  → lateral_movement
+    talking_to_neighbor         1  → head_turn
+
+
+2. EVENT-LEVEL DETECTION (within coverage, 10 events)
+----------------------------------------
+  Detected (any suspicious):   10 / 10 (100.0%)
+  Flagged (3-of-5 rule):       10 / 10 (100.0%)
+  Class correct:               10 / 10 (100.0%)
+
+  Detection latency (from event start):
+    Mean:   0.1s
+    Median: 0.0s
+    Max:    1.0s
+
+  Pose-detectable events only (excl. using_phone):
+    Detected:  10 / 10 (100.0%)
+    Flagged:   10 / 10
+    Class OK:  10 / 10
+
+
+3. PER-EVENT DETAIL
+----------------------------------------
+  Time         Seat  GT Class                   Det  Flag  Class   Lat
+  ─────────────────────────────────────────────────────────────────
+  00:11-00:15 B1    talking_to_neighbor          ✓     ✓      ✓    0s
+  00:14-00:20 A2    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:20-00:26 A1    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:26-00:32 B2    passing_note                 ✓     ✓      ✓    0s
+  00:45-00:47 B2    looking_sideways             ✓     ✓      ✓    0s
+  00:50-00:54 A3    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:53-00:58 B1    leaning_to_neighbor          ✓     ✓      ✓    0s
+  00:56-00:58 B3    looking_sideways             ✓     ✓      ✓    0s
+  00:59-01:03 A1    looking_sideways             ✓     ✓      ✓    0s
+  01:12-01:18 B2    passing_note                 ✓     ✓      ✓    1s
+
+
+4. TIME-BASED ANALYSIS (0-79s)
+----------------------------------------
+  Period                Seconds  Model sus%  Model flag%
+  ───────────────────────────────────────────────────────
+  suspicious                 46       82.6%        58.7%
+  hard_negative              11       81.8%        90.9%
+  quiet                      23       43.5%        39.1%
+
+  Interpretation:
+    "suspicious" = GT suspicious event active → model SHOULD flag
+    "hard_negative" = GT normal event (fidgeting etc.) → model should NOT flag
+    "quiet" = nothing annotated → model should NOT flag
+
+
+5. PER-PERSON BREAKDOWN
+----------------------------------------
+  Person     Obs   Sus   Sus%  Flag   Flag% Time Range     
+  ───────────────────────────────────────────────────────
+  P2          76    11   14%    11    14%  0:03-1:19      
+           lateral_movement: 7
+           head_turn: 4
+  P3          77     8   10%     3     4%  0:03-1:19      
+           lateral_movement: 7
+           head_turn: 1
+  P4          33    13   39%     9    27%  0:03-0:35      
+           lateral_movement: 13
+  P5          76    12   16%     6     8%  0:03-1:19      
+           lateral_movement: 12
+  P6          77    29   38%    21    27%  0:03-1:19      
+           lateral_movement: 17
+           head_turn: 12
+  P7          77    27   35%    23    30%  0:03-1:19      
+           lateral_movement: 24
+           head_turn: 3
+  P8          40    18   45%    14    35%  0:40-1:19      
+           head_turn: 9
+           lateral_movement: 9
+
+
+6. TRACKER STABILITY
+----------------------------------------
+  Unique track IDs:    7
+  Expected people:     8
+  ID reassignments:    0
+  Stable tracks (>80% coverage): 5
+  Transient tracks:              2
+    P4 (ID=3): 0:03-0:35, 33 obs
+    P8 (ID=7): 0:40-1:19, 40 obs
+
+
+7. SUMMARY
+======================================================================
+  Event detection rate:     10/10 (100%)
+  Event flagging rate:      10/10 (100%)
+  Class accuracy:           10/10 (100%)
+  False alarm (quiet):      39% of quiet seconds
+  False alarm (hard neg):   91% of hard negative seconds
+  Tracker stability:        5/8 stable tracks

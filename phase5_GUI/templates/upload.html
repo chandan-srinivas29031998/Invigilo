@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Upload — Invigilo{% endblock %}
+
+{% block content %}
+<section class="upload-page">
+    <div class="upload-header">
+        <a href="{{ url_for('index') }}" class="btn btn-outline btn-sm">← Back</a>
+        <h1>Upload Video</h1>
+    </div>
+
+    <div class="card upload-card" id="upload-card">
+        <div class="upload-zone" id="drop-zone">
+            <div class="upload-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+            </div>
+            <p class="upload-text">Drag &amp; drop a video file here</p>
+            <p class="upload-hint">or click to browse · MP4, AVI, MOV, MKV, WebM · Max 500 MB</p>
+            <input type="file" id="file-input" accept=".mp4,.avi,.mov,.mkv,.webm" hidden>
+        </div>
+        <div class="upload-progress" id="upload-progress" style="display:none">
+            <p class="upload-filename" id="upload-filename"></p>
+            <div class="progress-bar-bg large">
+                <div class="progress-bar-fill" id="upload-bar"></div>
+            </div>
+            <p class="upload-status" id="upload-status">Uploading...</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const uploadProgress = document.getElementById('upload-progress');
+const uploadBar = document.getElementById('upload-bar');
+const uploadStatus = document.getElementById('upload-status');
+const uploadFilename = document.getElementById('upload-filename');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files.length) uploadFile(fileInput.files[0]); });
+
+function uploadFile(file) {
+    if (file.size > 500 * 1024 * 1024) { alert('File too large. Maximum 500 MB.'); return; }
+
+    dropZone.style.display = 'none';
+    uploadProgress.style.display = 'block';
+    uploadFilename.textContent = file.name;
+    uploadStatus.textContent = `Uploading ${(file.size / 1024 / 1024).toFixed(1)} MB...`;
+
+    const formData = new FormData();
+    formData.append('video', file);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload');
+
+    xhr.upload.addEventListener('progress', e => {
+        if (e.lengthComputable) {
+            const pct = (e.loaded / e.total * 100).toFixed(0);
+            uploadBar.style.width = pct + '%';
+            uploadStatus.textContent = `Uploading... ${pct}%`;
+        }
+    });
+
+    xhr.onload = () => {
+        if (xhr.status === 200) {
+            const resp = JSON.parse(xhr.responseText);
+            uploadStatus.textContent = 'Upload complete — loading monitor...';
+            uploadBar.style.width = '100%';
+            window.location.href = resp.redirect;
+        } else {
+            try { uploadStatus.textContent = 'Error: ' + JSON.parse(xhr.responseText).error; }
+            catch { uploadStatus.textContent = 'Upload failed (' + xhr.status + ')'; }
+            uploadStatus.classList.add('error');
+        }
+    };
+    xhr.onerror = () => { uploadStatus.textContent = 'Network error'; uploadStatus.classList.add('error'); };
+    xhr.send(formData);
+}
+</script>
+{% endblock %}

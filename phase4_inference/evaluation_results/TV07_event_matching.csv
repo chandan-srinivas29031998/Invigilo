@@ -1,0 +1,8 @@
+event_idx,start_time,end_time,start_sec,end_sec,duration_sec,target_seat,gt_class,merged_class,pose_detectable,in_coverage,detected,flagged,class_correct,class_note,latency_sec,n_sus_predictions,n_total_predictions
+23,00:12,00:18,12,18,6,B2,talking_to_neighbor,head_turn,True,True,True,True,True,,0.0,19,66
+25,00:20,00:25,20,25,5,A3,leaning_to_neighbor,lateral_movement,True,True,True,True,True,,0.0,14,59
+26,00:24,00:29,24,29,5,B2,leaning_to_neighbor,lateral_movement,True,True,True,True,True,,1.0,17,59
+27,00:31,00:36,31,36,5,A1,talking_to_neighbor,head_turn,True,True,True,True,True,,0.0,19,60
+28,00:36,00:39,36,39,3,A3,looking_sideways,head_turn,True,True,True,True,True,,0.0,14,46
+29,00:36,00:42,36,42,6,B1,leaning_to_neighbor,lateral_movement,True,True,True,True,True,,0.0,18,64
+31,00:44,00:50,44,50,6,B1,looking_sideways,head_turn,True,True,True,True,True,,0.0,24,65

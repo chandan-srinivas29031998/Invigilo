@@ -1,0 +1,13 @@
+Invigilo Inference Summary
+==============================
+
+Video: TV07.MOV
+Duration: 53.1 seconds
+Frames: 1593
+Speed: 7.2 fps
+Time: 220.6 seconds
+Threshold: 0.20
+Flagging rule: 4-of-7
+Baseline calibration: OFF
+Tracker: ByteTrack
+Track merges: 0
